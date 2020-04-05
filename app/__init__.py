@@ -16,4 +16,9 @@ def create_app(config_name: str) -> Flask:
     app.register_blueprint(admin_blueprint)
     db.init_app(app=app)
 
+    # init database when app is created
+    from . import models
+    with app.test_request_context():
+        db.create_all()
+
     return app
