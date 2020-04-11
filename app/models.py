@@ -27,11 +27,11 @@ class User(db.Model):
 class Admin(db.Model):
     __tablename__ = 'admin'
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(50), unique=True)
+    manager = db.Column(db.String(50), unique=True)
     password = db.Column(db.String(255))
 
     def __repr__(self):
-        return '<Admin %r>' % self.username
+        return '<Admin %r>' % self.manager
 
     def check_password(self, password):
         return check_password_hash(self.password, password)

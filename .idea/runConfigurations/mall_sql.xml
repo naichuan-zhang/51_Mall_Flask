@@ -1,0 +1,8 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="mall.sql" type="DatabaseScript" editBeforeRun="true" nameIsGenerated="true">
+    <script-file value="$PROJECT_DIR$/mall.sql" />
+    <script-mode>FILE</script-mode>
+    <data-source id="3a975a8a-661c-4e40-aa3a-db82aa35e667" namespace="schema/&quot;mall&quot;" />
+    <method v="2" />
+  </configuration>
+</component>

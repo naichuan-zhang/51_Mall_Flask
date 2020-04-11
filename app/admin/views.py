@@ -1,9 +1,8 @@
-from flask import Blueprint
+from flask import Blueprint, render_template
+
+admin = Blueprint('admin', __name__, url_prefix='/admin')
 
 
-admin = Blueprint('admin', __name__)
-
-
-@admin.route('/admin')
-def index():
-    return 'hello from admin'
+@admin.route('/login')
+def login():
+    return render_template('admin/login.html')
