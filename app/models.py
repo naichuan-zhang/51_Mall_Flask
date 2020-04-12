@@ -2,7 +2,7 @@ from datetime import datetime
 
 from werkzeug.security import check_password_hash
 
-from app import db
+from . import db
 
 
 class User(db.Model):
@@ -13,7 +13,7 @@ class User(db.Model):
     email = db.Column(db.String(50), unique=True)
     phone = db.Column(db.String(), unique=True)
     consumption = db.Column(db.DECIMAL(10, 2), default=0)
-    add_time = db.Column(db.DateTime, index=True, default=datetime.now)
+    addtime = db.Column(db.DateTime, index=True, default=datetime.now)
 
     orders = db.relationship('Orders', backref='user')
 
@@ -46,7 +46,7 @@ class Orders(db.Model):
     receiver_addr = db.Column(db.String(100))
     receiver_tel = db.Column(db.String(50))
     remark = db.Column(db.String(100))
-    add_time = db.Column(db.DateTime, index=True, default=datetime.now)
+    addtime = db.Column(db.DateTime, index=True, default=datetime.now)
 
     orders_detail = db.relationship('OrdersDetail', backref='orders')
 
@@ -60,7 +60,7 @@ class Cart(db.Model):
     goods_id = db.Column(db.Integer, db.ForeignKey('goods.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     number = db.Column(db.Integer, default=0)
-    add_time = db.Column(db.DateTime, index=True, default=datetime.now)
+    addtime = db.Column(db.DateTime, index=True, default=datetime.now)
 
     def __repr__(self):
         return '<Cart %r>' % self.id
@@ -71,7 +71,7 @@ class SuperCat(db.Model):
     __tablename__ = 'supercat'
     id = db.Column(db.Integer, primary_key=True)
     cat_name = db.Column(db.String(100))
-    add_time = db.Column(db.DateTime, index=True, default=datetime.now)
+    addtime = db.Column(db.DateTime, index=True, default=datetime.now)
 
     subcat = db.relationship('SubCat', backref='supercat')
     goods = db.relationship('Goods', backref='supercat')
@@ -104,7 +104,7 @@ class Goods(db.Model):
     views_count = db.Column(db.Integer, default=0)
     is_sale = db.Column(db.Boolean(), default=False)
     is_new = db.Column(db.Boolean(), default=False)
-    add_time = db.Column(db.DateTime, index=True, default=datetime.now)
+    addtime = db.Column(db.DateTime, index=True, default=datetime.now)
     # 所属大分类
     supercat_id = db.Column(db.Integer, db.ForeignKey('supercat.id'))
     # 所属小分类
