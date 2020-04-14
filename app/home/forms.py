@@ -87,3 +87,53 @@ class RegisterForm(FlaskForm):
         user_count = User.query.filter_by(phone=phone).count()
         if user_count >= 1:
             raise ValidationError('手机号已存在!')
+
+
+class LoginForm(FlaskForm):
+    username = StringField(
+        label='用户名：',
+        validators=[
+            DataRequired(message='用户名不能为空！'),
+            Length(min=3, max=50, message='用户名长度必须在3-50位之间'),
+        ],
+        description='用户名',
+        render_kw={
+            'type': 'text',
+            'placeholder': '用户名',
+            'class': 'validate-username',
+            'size': 38,
+            'maxlength': 99,
+        }
+    )
+    password = PasswordField(
+        label='密码：',
+        validators=[
+            DataRequired("密码不能为空！"),
+            Length(min=3, message="密码长度不少于6位")
+        ],
+        description='密码',
+        render_kw={
+            'type': 'password',
+            'placeholder': '密码',
+            'class': 'validate-password',
+            'size': 38,
+            'maxlength': 99,
+        }
+    )
+    verify_code = StringField(
+        label='验证码：',
+        validators=[
+            DataRequired(),
+        ],
+        render_kw={
+            'class': 'validate-code',
+            'size': 18,
+            'maxlength': 4,
+        }
+    )
+    submit = SubmitField(
+        label='登录',
+        render_kw={
+            'class': 'btn btn-primary login',
+        }
+    )
