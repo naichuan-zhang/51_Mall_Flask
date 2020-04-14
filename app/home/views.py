@@ -4,13 +4,34 @@ from io import BytesIO
 from typing import Tuple
 
 from PIL import Image, ImageFont, ImageDraw
-from flask import render_template, session, redirect, url_for, flash, make_response
+from flask import render_template, session, redirect, url_for, flash, make_response, request
 from werkzeug.security import generate_password_hash
 
 from app.models import Goods, User
 from . import home
-from .forms import RegisterForm, LoginForm
+from .forms import RegisterForm, LoginForm, PasswordForm
 from .. import db
+
+
+def get_verify_code() -> Tuple:
+    code = generate_text()
+    width, height = 120, 50
+    img = Image.new('RGB', (width, height), 'white')
+    font = ImageFont.truetype(font='app/static/fonts/arial.ttf', size=40)
+    draw = ImageDraw.Draw(img)
+    for item in range(4):
+        draw.text((5 + random.randint(-3, 3) + 23 * item, 5 + random.randint(-3, 3)),
+                  text=code[item], fill=generate_color(), font=font)
+    return img, code
+
+
+def generate_text() -> str:
+    letters_digits = string.ascii_letters + string.digits
+    return ''.join(random.choice(letters_digits) for i in range(4))
+
+
+def generate_color() -> Tuple:
+    return random.randint(32, 127), random.randint(32, 127), random.randint(32, 127)
 
 
 @home.route('/')
@@ -90,31 +111,38 @@ def login():
 
 @home.route('/logout')
 def logout():
-    pass
+    session.pop('user_id', None)
+    session.pop('username', None)
+    return redirect(url_for('home.login'))
 
 
-@home.route('/modify_password')
+@home.route('/modify_pwd', methods=['GET', 'POST'])
 def modify_password():
-    pass
+    form = PasswordForm()
+    if form.validate_on_submit():
+        new_password = form.password.data
+        user = User.query.filter_by(username=session['username']).first()
+        user.password = generate_password_hash(new_password)
+        db.session.add(user)
+        db.session.commit()
+        return "<script>alert('密码修改成功！'); location.href='/';</script>"
+
+    return render_template('home/modify_password.html', form=form)
 
 
-def get_verify_code() -> Tuple:
-    code = generate_text()
-    width, height = 120, 50
-    img = Image.new('RGB', (width, height), 'white')
-    font = ImageFont.truetype(font='app/static/fonts/arial.ttf', size=40)
-    draw = ImageDraw.Draw(img)
-    for item in range(4):
-        draw.text((5 + random.randint(-3, 3) + 23 * item, 5 + random.randint(-3, 3)),
-                  text=code[item], fill=generate_color(), font=font)
-    return img, code
+@home.route('/goods_detail/<int:goods_id>')
+def goods_detail(goods_id: int):
+    user_id = session.get('user_id', 0)
+    goods = Goods.query.get_or_404(goods_id)
+    type_id = request.args.get('type')
+    goods.views_count = goods.views_count + 1
+    db.session.add(goods)
+    db.session.commit()
 
+    hot_goods = Goods.query.filter_by(subcat_id=goods.subcat_id)\
+        .order_by(Goods.views_count.desc()).limit(5).all()
+    similar_goods = Goods.query.filter_by(subcat_id=goods.subcat_id)\
+        .order_by(Goods.addtime.desc()).limit(5).all()
 
-def generate_text() -> str:
-    letters_digits = string.ascii_letters + string.digits
-    return ''.join(random.choice(letters_digits) for i in range(4))
-
-
-def generate_color() -> Tuple:
-    return random.randint(32, 127), random.randint(32, 127), random.randint(32, 127)
-
+    return render_template('home/goods_detail.html', user_id=user_id, type_id=type_id,
+                           hot_goods=hot_goods, similar_goods=similar_goods)

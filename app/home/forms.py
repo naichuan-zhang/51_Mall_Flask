@@ -1,3 +1,4 @@
+from flask import session
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, Field
 from wtforms.validators import DataRequired, Length, Regexp, Email, EqualTo, ValidationError
@@ -137,3 +138,53 @@ class LoginForm(FlaskForm):
             'class': 'btn btn-primary login',
         }
     )
+
+
+class PasswordForm(FlaskForm):
+    old_password = PasswordField(
+        label="原始密码 ：",
+        validators=[
+            DataRequired("原始密码不能为空！")
+        ],
+        description="原始密码",
+        render_kw={
+            "placeholder": "请输入原始密码！",
+            "size": 38,
+        }
+    )
+    password = PasswordField(
+        label="新密码 ：",
+        validators=[
+            DataRequired("新密码不能为空！")
+        ],
+        description="新密码",
+        render_kw={
+            "placeholder": "请输入新密码！",
+            "size": 38,
+        }
+    )
+    repassword = PasswordField(
+        label="确认密码 ：",
+        validators=[
+            DataRequired("请输入确认密码！"),
+            EqualTo('password', message="两次密码不一致！")
+        ],
+        description="确认密码",
+        render_kw={
+            "placeholder": "请输入确认密码！",
+            "size": 38,
+        }
+    )
+    submit = SubmitField(
+        '确认修改',
+        render_kw={
+            "class": "btn btn-primary login",
+        }
+    )
+
+    def validate_old_password(self, field: Field):
+        old_password = field.data
+        user_id = session['user_id']
+        user = User.query.get(int(user_id))
+        if not user.check_password(old_password):
+            raise ValidationError('原始密码错误！')
