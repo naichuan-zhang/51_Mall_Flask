@@ -7,7 +7,7 @@ from PIL import Image, ImageFont, ImageDraw
 from flask import render_template, session, redirect, url_for, flash, make_response, request
 from werkzeug.security import generate_password_hash
 
-from app.models import Goods, User
+from app.models import Goods, User, Cart
 from . import home
 from .forms import RegisterForm, LoginForm, PasswordForm
 from .. import db
@@ -144,5 +144,28 @@ def goods_detail(goods_id: int):
     similar_goods = Goods.query.filter_by(subcat_id=goods.subcat_id)\
         .order_by(Goods.addtime.desc()).limit(5).all()
 
-    return render_template('home/goods_detail.html', user_id=user_id, type_id=type_id,
-                           hot_goods=hot_goods, similar_goods=similar_goods)
+    return render_template('home/goods_detail.html', goods=goods, user_id=user_id,
+                           type_id=type_id, hot_goods=hot_goods, similar_goods=similar_goods)
+
+
+@home.route('/cart_add')
+def cart_add():
+    print(request.args.get('user_id'))
+    cart = Cart(
+        goods_id=request.args.get('goods_id'),
+        number=request.args.get('number'),
+        user_id=session.get('user_id', 0)   # 用户未登录默认为0
+    )
+    db.session.add(cart)
+    db.session.commit()
+    return redirect(url_for('home.shopping_cart'))
+
+
+@home.route('/shopping_cart')
+def shopping_cart():
+    return render_template('home/shopping_cart.html')
+
+
+@home.route('/goods_list')
+def goods_list(id: int):
+    return None

@@ -67,5 +67,42 @@
             </div>
         </div>
     </div>
+    <header id="mr-header" class="wrap mr-header">
+        <div class="container">
+            <div class="row">
+                <nav id="mr-mainnav" class="col-xs-12 col-md-6 mr-mainnav navbar navbar-default">
+                    <div class="mr-megamenu animate slide" data-duration="400" data-responsive="true">
+                        <ul class="nav navbar-nav level0">
+                            <li itemprop="name" data-id="435" data-level="1">
+                                <a id="index" itemprop="url" class="" href="{{ url_for('home.index') }}" data-target="#">
+                                    首页
+                                </a>
+                            </li>
+                            <li itemprop="name" data-id="510" data-level="1">
+								<!--<a id="jingying" itemprop="url" class="" href="{{url_for('home.goods_list',supercat_id=14)}}" data-target="#">-->
+								<a id="jingying" itemprop="url" class="" href="/goods_list/14?type=14" data-target="#">
+									图书类
+								</a>
+							</li>
+							<li itemprop="name" data-id="510" data-level="1">
+								<a id="wenyi" itemprop="url" class="" href="/goods_list/15?type=15"
+								data-target="#">家电类</a>
+							</li>
+
+							<li itemprop="name" data-id="510" data-level="1">
+								<a id="jiaoyu" itemprop="url" class="" href="/goods_list/16?type=16"
+								data-target="#">服装类</a>
+							</li>
+							<li itemprop="name" data-id="510" data-level="1">
+								<a id="shenghuo" itemprop="url" class="" href="/goods_list/17?type=17"
+								   data-target="#">电子类
+								</a>
+							</li>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </header>
 </body>
 </html>
