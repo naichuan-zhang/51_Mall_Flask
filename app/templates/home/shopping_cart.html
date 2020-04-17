@@ -1,5 +1,179 @@
 {% extends 'home/common.html' %}
 
 {% block content %}
-
+    <div id="mr-mainbody" class="container mr-mainbody">
+        <div class="row">
+            <div id="mr-content" class="mr-content col-xs-12">
+                <div id="mr-shop" class="mrshop common-home">
+                    <div class="container_oc">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <h1>我的购物车</h1>
+                                <div class="table-responsive cart-info">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center image">商品图片</th>
+                                                <th class="text-center name">商品名称</th>
+                                                <th class="text-center quantity">数量</th>
+                                                <th class="text-center price">单价</th>
+                                                <th class="text-right">总计</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for item in carts %}
+                                            <tr>
+                                                <td class="text-center image" style="width: 20%;">
+                                                    <a href="{{ url_for('home.goods_detail', goods_id=item.goods_id) }}">
+                                                        <img src="{{ url_for('static', filename='images/goods/' + item.goods.picture) }}" alt="">
+                                                    </a>
+                                                </td>
+                                                <td class="text-left name">
+                                                    <a href="{{ url_for('home.goods_detail', goods_id=item.goods_id) }}">
+                                                        {{ item.goods.name }}
+                                                    </a>
+                                                </td>
+                                                <td class="text-left quantity">
+                                                    {{ item.number }}件
+                                                </td>
+                                                <td class="text-left price">
+                                                    {{ item.goods.current_price }}元
+                                                </td>
+                                                <td class="text-left total">
+                                                    {{ item.number * item.goods.current_price }}元
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="cart-total">
+                                    <h3>总计： <span style="color: red;">{{ total_price }} 元</span></h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div id="content_oc" class="col-sm-12">
+                                <h1>物流信息</h1>
+                                <form action="" method="post" id="myform">
+                                    <div class="table-responsive cart-info">
+                                        <table class="table table-bordered">
+                                            <tbody>
+                                            <tr class="text-right" style="width: 20%">
+                                                <td>收货人姓名：</td>
+                                                <td class="text-left quantity">
+                                                    <div class="input-group btn-block" style="max-width: 400px;">
+                                                        <input type="text" id="receiver-name" name="receiver-name" size="10" class="form-control">
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr class="text-right">
+                                                <td>收货人手机：</td>
+                                                <td class="text-left quantity">
+                                                    <div class="input-group btn-block" style="max-width: 400px;">
+                                                        <input type="text" id="receiver-tel" name="receiver-tel" size="10" class="form-control">
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr class="text-right">
+                                                <td>收货人地址：</td>
+                                                <td class="text-left quantity">
+                                                    <div class="input-group btn-block" style="max-width: 400px;">
+                                                        <input type="text" id="receiver-address" name="receiver-address" size="10" class="form-control">
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr class="text-right">
+                                                <td>备注：</td>
+                                                <td class="text-left quantity">
+                                                    <div class="input-group btn-block" style="max-width: 400px;">
+                                                        <input type="text" id="receiver-remark" name="receiver-remark" size="10" class="form-control">
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <br/>
+                        <div class="row">
+                            <div id="content_oc" class="col-sm-12">
+                                <h1>支付方式</h1>
+                                <div class="table-responsive cart-info">
+                                    <table class="table table-bordered">
+                                        <tbody>
+                                        <tr>
+                                            <td class="text-left"><img src="{{ url_for('static', filename='home/images/zhifubao.png') }}" alt=""></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <br><br>
+                                <div class="buttons">
+                                    <div class="pull-left">
+                                        <a href="{{ url_for('home.index') }}">继续购物</a>
+                                    </div>
+                                    <div class="pull-left">
+                                        <a href="{{ url_for('home.cart_clear') }}">清空购物车</a>
+                                    </div>
+                                    <div class="pull-right">
+                                        <a href="javascript:zhifu();" class="trigger btn btn-primary btn-primary">结账</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="{{url_for('static',filename='home/js/jBox/jquery-1.4.2.min.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static',filename='home/js/jBox/jquery.jBox-2.3.min.js')}}"></script>
+    <link type="text/css" rel="stylesheet" href="{{url_for('static',filename='home/js/jBox/Skins2/Pink/jbox.css')}}">
+    <script type="text/javascript">
+        function zhifu() {
+            if ($('#receiver-name').val() === "") {
+                alert('收货人姓名不能为空');
+                return;
+            }
+            if ($('#receiver-tel').val() === "") {
+                alert('收货人手机不能为空！');
+                return;
+            }
+            if (isNaN($('#receiver-tel').val())) {
+                alert("手机号请输入数字");
+                return;
+            }
+            //验证收货人地址
+            if ($('#receiver-address').val() === "") {
+                alert('收货人地址不能为空！');
+                return;
+            }
+            let html = '<div class="popup_cont">'
+                    + '<div style="width: 256px; height: 250px; text-align: center; margin:70px" >'
+                    + '<img src="/static/home/images/qr.png" width="256" height="256" />'
+                    + '<p style="color:red;padding-tope:30px">该页面仅为测试页面，并未实现支付功能</p></div>'
+                    + '</div>';
+            let content = {
+                state1: {
+                    content: html,
+                    buttons: {'支付': 1, '取消': 0},
+                    buttonsFocus: 0,
+                    submit: function (v, h, f) {
+                        if (v === 0) {
+                            return true;    // close the window
+                        } else if (v === 1) {
+                            document.getElementById('myform').submit();
+                            console.log('success!!!');
+                            return true;
+                        }
+                        return false;
+                    }
+                }
+            };
+            $.jBox.open(content, '支付', 400, 450);
+        }
+    </script>
 {% endblock %}

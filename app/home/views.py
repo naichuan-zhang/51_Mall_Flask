@@ -1,5 +1,6 @@
 import random
 import string
+from functools import wraps
 from io import BytesIO
 from typing import Tuple
 
@@ -32,6 +33,15 @@ def generate_text() -> str:
 
 def generate_color() -> Tuple:
     return random.randint(32, 127), random.randint(32, 127), random.randint(32, 127)
+
+
+def login_required(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if "user_id" not in session:
+            return redirect(url_for("home.login"))
+        return f(*args, **kwargs)
+    return wrap
 
 
 @home.route('/')
@@ -161,9 +171,26 @@ def cart_add():
     return redirect(url_for('home.shopping_cart'))
 
 
+@home.route('/cart_clear')
+@login_required
+def cart_clear():
+    user_id = session.get('user_id', 0)
+    Cart.query.filter_by(user_id=user_id).update({'user_id': 0})
+    db.session.commit()
+    return redirect(url_for('home.shopping_cart'))
+
+
 @home.route('/shopping_cart')
+@login_required
 def shopping_cart():
-    return render_template('home/shopping_cart.html')
+    user_id = session.get('user_id')
+    carts = Cart.query.filter_by(user_id=user_id)\
+        .order_by(Cart.addtime.desc()).all()
+    total_price = Cart.get_total_price_by_user_id(user_id=user_id)
+    if carts:
+        return render_template('home/shopping_cart.html', carts=carts, total_price=total_price)
+    else:
+        return render_template('home/empty_cart.html')
 
 
 @home.route('/goods_list')

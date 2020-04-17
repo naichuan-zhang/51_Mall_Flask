@@ -1,6 +1,6 @@
 from flask import session
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, Field
+from wtforms import StringField, PasswordField, SubmitField, Field, TextAreaField
 from wtforms.validators import DataRequired, Length, Regexp, Email, EqualTo, ValidationError
 
 from app.models import User
@@ -188,3 +188,50 @@ class PasswordForm(FlaskForm):
         user = User.query.get(int(user_id))
         if not user.check_password(old_password):
             raise ValidationError('原始密码错误！')
+
+
+class SuggetionForm(FlaskForm):
+    """
+    意见建议
+    """
+    name = StringField(
+        label="姓名",
+        validators=[
+            DataRequired("姓名不能为空！")
+        ],
+        description="姓名",
+        render_kw={
+            "placeholder": "请输入姓名！",
+            "class": "form-control"
+        }
+    )
+    email = StringField(
+        label="邮箱",
+        validators=[
+            DataRequired("邮箱不能为空！")
+        ],
+        description="邮箱",
+        render_kw={
+            "type": "email",
+            "placeholder": "请输入邮箱！",
+            "class": "form-control"
+        }
+    )
+    content = TextAreaField(
+        label="意见建议",
+        validators=[
+            DataRequired("内容不能为空！")
+        ],
+        description="意见建议",
+        render_kw={
+            "class": "form-control",
+            "placeholder": "请输入内容！",
+            "rows": 7
+        }
+    )
+    submit = SubmitField(
+        '发送消息',
+        render_kw={
+            "class": "btn-default btn-cf-submit",
+        }
+    )

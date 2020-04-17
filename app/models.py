@@ -62,6 +62,15 @@ class Cart(db.Model):
     number = db.Column(db.Integer, default=0)
     addtime = db.Column(db.DateTime, index=True, default=datetime.now)
 
+    @staticmethod
+    def get_total_price_by_user_id(user_id: int) -> float:
+        total_price = 0
+        carts = Cart.query.filter_by(user_id=user_id).all()
+        for cart in carts:
+            price = cart.number * cart.goods.current_price
+            total_price += price
+        return total_price
+
     def __repr__(self):
         return '<Cart %r>' % self.id
 
