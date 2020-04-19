@@ -1,0 +1,119 @@
+{% extends "home/common.html" %}
+
+{% block content %}
+    <div id="mr-mainbody" class="container mr-mainbody">
+        <div class="row">
+            <div id="mr-content" class="mr-content col-xs-12 col-sm-12 col-md-9 col-md-push-3">
+                <div id="system-message-container" style="display: none;"></div>
+                <div id="mrshop" class="mrshop common-home">
+                    <div class="container_oc">
+                        <ul class="breadcrumb"></ul>
+                        <div class="row">
+                            <div id="content_oc" class="col-sm-12">
+                                <div class="box_oc">
+                                    <div class="box-heading">
+                                        <h1 class="mrshop_heading_h1">搜索结果</h1>
+                                    </div>
+                                    <div class="box-content1">
+                                        <hr>
+                                        <div class="row">
+                                            {% if page_data.items %}
+                                                {% for item in page_data.items %}
+                                                <div class="product-layout product-grid col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                                                <div class="product-thumb">
+                                                    <div class="actions">
+                                                        <div class="image">
+                                                            <a href="/goods_detail/{{item.id}}?type={{item.supercat_id}}">
+                                                                <img src="{{url_for('static',filename='images/goods/'+item.picture)}}"
+                                                                class="img-responsive">
+                                                            </a>
+                                                        </div>
+                                                        <div class="button-group btn-grid">
+                                                            <div class="cart">
+                                                                <button class="btn btn-primary btn-primary"
+                                                                    type="button" data-toggle="tooltip"
+                                                                    onclick='javascript:window.location.href="/cart_add?goods_id={{item.id}}&number=1"; '
+                                                                    style="display: none; width: 33.3333%;"
+                                                                    data-original-title="添加到购物车">
+                                                                    <i class="fa fa-shopping-cart"></i>
+                                                                </button>
+                                                            </div>
+                                                            <div class="wishlist">
+                                                                <button class="btn" type="button" data-toggle="tooltip"
+                                                                    title="收藏">
+                                                                    <i class="fa fa-heart"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <div class="caption">
+                                                            <div class="name">
+                                                                <a href="/goods_detail/{{item.id}}?type={{item.supercat_id}}" style="width: 95%">
+                                                                    <span style="color: #0885B1">商品名称：</span>{{item.name}}</a>
+                                                            </div>
+                                                            <p class="price">
+                                                                <span class="price-new">分类：</span> <span>{{item.subcat.cat_name}}</span>
+                                                                <span class="price-tax">价格: {{item.current_price}}元
+                                                                </span>
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                                {% endfor %}
+                                            {% else %}
+                                                <div style="text-align:center;font-size:16px;color:red">没有插叙到您想要的商品哦！</div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="row pagination">
+                                            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                            <tr>
+                                            <td height="30" align="right">
+                                                {% if page_data.has_prev %}
+                                                    <a href="{{ url_for('home.goods_search', page=page_data.prev_num, keywords=keywords) }}">上一页</a>
+                                                {% endif %}
+                                                {% if page_data.items %}
+                                                    {% for page_num in page_data.iter_pages() %}
+                                                        {% if page_num != page_data.page %}
+                                                            <a href="{{ url_for('home.goods_search', page=page_num, keywords=keywords) }}">{{ page_num }}</a>
+                                                        {% else %}
+                                                            <a class="active" style="color: red;" href="{{ url_for('home.goods_search', page=page_num, keywords=keywords) }}">{{ page_num }}</a>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                {% endif %}
+                                                {% if page_data.has_next %}
+                                                    <a href="{{ url_for('home.goods_search', page=page_data.next_num, keywords=keywords) }}">下一页</a>
+                                                {% endif %}
+                                            </td>
+                                            </tr>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <h3 class="module-title">热门商品</h3>
+            {% for item in hot_goods %}
+                <div class="image">
+                    <a href="{{ url_for('home.goods_detail', goods_id=item.id) }}">
+                        <img src="{{ url_for('static', filename='images/goods/' + item.picture) }}" alt="">
+                    </a>
+                </div>
+                <div class="name">
+                    <a href="{{ url_for('home.goods_detail', goods_id=item.id) }}">
+                        {{ item.name }}
+                    </a>
+                </div>
+                <div class="price">
+                    {{ item.current_price }} 元
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

@@ -43,7 +43,7 @@
                             <!-- 搜索条 -->
                             <div class="search_box">
                                 <div class="top-nav-search">
-                                    <form method="get" action="#">
+                                    <form method="get" action="{{ url_for('home.goods_search') }}">
                                         <input type="text" name="keywords" size="38"
                                                style="border: 0px;" class="top-nav-search-input" placeholder="请输入内容" />
                                         <button type="submit" class="search_box_img" onfocus="this.blur()">

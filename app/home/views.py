@@ -196,3 +196,18 @@ def shopping_cart():
 @home.route('/goods_list')
 def goods_list(id: int):
     return None
+
+
+@home.route('/search')
+def goods_search():
+    page = request.args.get('page', 1, type=int)
+    keywords = request.args.get('keywords', '', type=str)
+    if keywords:
+        page_data = Goods.query.filter(Goods.name.like('%' + keywords + '%'))\
+            .order_by(Goods.addtime.desc()).paginate(page=page, per_page=12)
+    else:
+        page_data = Goods.query.order_by(Goods.addtime.desc())\
+            .paginate(page=page, per_page=12)
+    hot_goods = Goods.query.order_by(Goods.views_count.desc()).limit(7).all()
+
+    return render_template('home/goods_search.html', page_data=page_data, keywords=keywords, hot_goods=hot_goods)
