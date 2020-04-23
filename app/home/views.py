@@ -193,9 +193,15 @@ def shopping_cart():
         return render_template('home/empty_cart.html')
 
 
-@home.route('/goods_list')
-def goods_list(id: int):
-    return None
+@home.route('/goods_list/<int:supercat_id>')
+def goods_list(supercat_id: int):
+    page = request.args.get('page', 1, type=int)
+    page_data = Goods.query.filter_by(supercat_id=supercat_id)\
+        .paginate(page=page, per_page=12)
+    hot_goods = Goods.query.filter_by(supercat_id=supercat_id)\
+        .order_by(Goods.views_count.desc()).limit(7).all()
+    return render_template('home/goods_list.html', page=page, page_data=page_data,
+                           hot_goods=hot_goods, supercat_id=supercat_id)
 
 
 @home.route('/search')

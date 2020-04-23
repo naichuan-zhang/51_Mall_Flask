@@ -1,0 +1,99 @@
+{% extends 'admin/common.html' %}
+
+{% block content %}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#supercat_id").change(function () {
+            let supercat_id = $(this).children('option:selected').val()
+            selSubCat(supercat_id);
+        })
+    });
+
+    function selSubCat(val){
+    $.get("{{ url_for('admin.select_sub_cat')}}",
+            {supercat_id: val},
+            function(result) {
+                html_doc = ''
+                if(result.status === 1) {
+                　　$.each(result.data, function(idx, obj) {
+                        html_doc += '<option value='+obj.id+'>'+obj.cat_name+'</option>'
+                　　});
+                } else {
+                     html_doc += '<option value=0>前选择子类</option>'
+                }
+                $("#subcat_id").html(html_doc);
+        });
+    }
+</script>
+<form action="{{ url_for('admin.goods_add') }}" method="post">
+    <table width="70%" border="0" cellpadding="0" cellspacing="0">
+        <tr>
+            <td>{{ form.name.label }}</td>
+            <td>
+                {{ form.name }}
+                {% for error in form.name.errors %}
+                <span style="color: red">{{ error }}</span>
+                {% endfor %}
+            </td>
+        </tr>
+        <tr>
+            <td>{{ form.supercat_id.label }}</td>
+            <td>
+                {{ form.supercat_id }}
+                {% for error in form.supercat_id.errors %}
+                <span style="color: red">{{ error }}</span>
+                {% endfor %}
+            </td>
+            <td>{{ form.subcat_id.label }}</td>
+            <td>
+                {{ form.subcat_id }}
+                {% for error in form.subcat_id.errors %}
+                <span style="color: red">{{ error }}</span>
+                {% endfor %}
+            </td>
+        </tr>
+        <tr>
+            <td>{{ form.picture.label }}</td>
+            <td>
+                {{ form.picture }}
+                {% for error in form.picture.errors %}
+                <span style="color: red">{{ error }}</span>
+                {% endfor %}
+            </td>
+            <td>{{ form.original_price.label }}</td>
+            <td>
+                {{ form.original_price }}
+                {% for error in form.original_price.errors %}
+                <span style="color: red">{{ error }}</span>
+                {% endfor %}
+            </td>
+        </tr>
+        <tr>
+            <td>{{ form.is_new.label }}</td>
+            <td>
+                {{ form.is_new }}
+                {% for error in form.is_new.errors %}
+                <span style="color: red">{{ error }}</span>
+                {% endfor %}
+            </td>
+            <td>{{ form.is_sale.label }}</td>
+            <td>
+                {{ form.is_sale }}
+                {% for error in form.is_sale.errors %}
+                <span style="color: red">{{ error }}</span>
+                {% endfor %}
+            </td>
+        </tr>
+        <tr>
+            <td>{{ form.introduction.label }}</td>
+            <td>{{ form.introduction }}</td>
+        </tr>
+        <tr>
+            <td>
+                {{ form.csrf_token }}
+                {{ form.submit }}
+            </td>
+        </tr>
+    </table>
+</form>
+{% endblock %}
