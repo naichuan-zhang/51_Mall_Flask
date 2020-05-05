@@ -2,11 +2,12 @@ from decimal import Decimal
 from functools import wraps
 
 from flask import Blueprint, render_template, session, redirect, url_for, flash, request, jsonify
+from sqlalchemy import or_
 from werkzeug.security import generate_password_hash
 
 from app import db
 from app.admin.forms import AdminLoginForm, GoodsForm
-from app.models import Admin, Goods, SuperCat, SubCat
+from app.models import Admin, Goods, SuperCat, SubCat, User
 
 admin = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -130,36 +131,77 @@ def select_sub_cat():
     return jsonify(result)
 
 
+@admin.route('/goods/edit/<int:id>', methods=['GET', 'POST'])
+def goods_edit(id: int):
+    goods = Goods.query.get_or_404(id)
+    form = GoodsForm()
+    form.supercat_id.choices = [(v.id, v.cat_name) for v in SuperCat.query.all()]
+    form.subcat_id.choices = [(v.id, v.cat_name) for v in SubCat.query.filter_by(super_cat_id=goods.supercat_id).all()]
+    if request.method == 'GET':
+        form.name.data = goods.name
+        form.supercat_id.data = goods.supercat_id
+        form.subcat_id.data = goods.subcat_id
+        form.original_price.data = goods.original_price
+        form.picture.data = goods.picture
+        form.is_new.data = goods.is_new
+        form.is_sale.data = goods.is_sale
+        form.introduction.data = goods.introduction
+    elif form.validate_on_submit():
+        goods.name = form.name.data
+        goods.supercat_id = form.supercat_id.data
+        goods.subcat_id = form.subcat_id.data
+        goods.original_price = form.original_price.data
+        goods.picture = form.picture.data
+        goods.is_new = form.is_new.data
+        goods.is_sale = form.is_sale.data
+        goods.introduction = form.introduction.data
+        db.session.add(goods)
+        db.session.commit()
+        return redirect(url_for('admin.index'))
+    return render_template('admin/goods_edit.html', goods_id=id, form=form)
+
+
 @admin.route('/')
 def topgoods():
     return None
 
 
-@admin.route('/')
+@admin.route('/user/list')
+@admin_login
 def user_list():
-    return None
+    page = request.args.get('page', 1, type=int)
+    keyword = request.args.get('keyword', '', type=str)
+    if keyword:
+        filters = or_(User.username == keyword, User.password == keyword)
+        page_data = User.query.filter(filters)\
+            .order_by(User.addtime.desc())\
+            .paginate(page=page, per_page=5)
+    else:
+        page_data = User.query.order_by(User.addtime.desc())\
+            .paginate(page=page, per_page=5)
+    return render_template('admin/user_list.html', page_data=page_data)
 
 
 @admin.route('/')
+@admin_login
 def orders_list():
     return None
 
 
 @admin.route('/')
+@admin_login
 def supercat_list():
     return None
 
 
 @admin.route('/')
+@admin_login
 def subcat_list():
     return None
 
 
 @admin.route('/')
+@admin_login
 def goods_detail():
     return None
 
-
-@admin.route('/goods/edit/<int:id>', methods=['GET', 'POST'])
-def goods_edit(id: int):
-    return None
